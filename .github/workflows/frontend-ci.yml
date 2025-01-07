@@ -69,7 +69,7 @@ jobs:
           CLOUDFRONT_DIST_ID=$(echo $TERRAFORM_OUTPUT | jq -r '.cloudfront_distribution_id.value')
 
           # Deploy to S3
-          aws s3 sync out/ s3://$S3_BUCKET_NAME --delete
+          aws s3 sync frontend/out s3://$S3_BUCKET_NAME --delete
 
           # Invalidate CloudFront cache
           aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DIST_ID --paths '/*'
