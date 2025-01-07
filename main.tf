@@ -177,6 +177,12 @@ resource "aws_apigatewayv2_stage" "default_stage" {
   api_id      = aws_apigatewayv2_api.http_api.id
   name        = "$default"
   auto_deploy = true
+
+  cors_configuration {
+    allow_origins = ["https://d129pu071hahh1.cloudfront.net"]
+    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_headers = ["content-type"]
+  }
 }
 
 data "archive_file" "lambda"{
