@@ -1,0 +1,100 @@
+name: Infrastructure CI/CD
+on:
+  push:
+    paths:
+      - '*.tf'
+      - '*.tfvars'
+      # - 'backend/**'
+      - '.github/workflows/infrastructure-ci.yml'
+  pull_request:
+    paths:
+      - '*.tf'
+      - '*.tfvars'
+      # - 'backend/**'
+      - '.github/workflows/infrastructure-ci.yml'
+
+jobs:
+  terraform-plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acquire Lock
+        uses: softprops/turnstyle@v1
+        with:
+          poll-interval-seconds: 10
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.10.3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan.binary
+
+      - name: Save Terraform Plan Output
+        run: terraform show -json tfplan.binary > plan.json
+
+      - name: Upload Plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan
+          path: plan.json
+
+  manual-approval:
+    needs: terraform-plan
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Await Manual approval
+        uses: hmarr/auto-approve-action@v3
+
+  terraform-apply:
+    needs: manual-approval
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acquire Lock
+        uses: softprops/turnstyle@v1
+        with:
+          poll-interval-seconds: 10
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.10.3
+      
+      - name: Download Plan Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: terraform-plan
+          path: .
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Apply Terraform Plan
+        run: terraform apply -auto-approve tfplan.binary

@@ -1,0 +1,54 @@
+name: Backend CI/CD
+on:
+    push:
+        paths:
+            - 'backend/**'
+    pull_request:
+        paths:
+            - 'backend/**'
+    repository_dispatch:
+        types: [trigger-backend]
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+            - name: Setup Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: '3.9'
+            - name: Install dependencies
+              run: |
+                cd backend
+                pip install -r requirements.txt
+            - name: Run tests
+              run: |
+                cd backend
+                pytest
+            - name: Install jq
+              run: sudo apt-get install jq
+            - name: Deploy to Lambda
+              env:
+                AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                AWS_REGION: 'us-east-1'
+              run: |
+
+
+                # Check AWS CLI version
+                aws --version || (
+                  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                  unzip awscliv2.zip
+                  sudo ./aws/install
+                )
+
+                # Fetch Terraform outputs
+                TERRAFORM_OUTPUT=$(aws s3 cp s3://terraform-output-bucket-yashk/terraform-output.json -)
+                LAMBDA_FUNCTION_NAME=$(echo $TERRAFORM_OUTPUT | jq -r '.lambda_function_name.value')
+
+                cd backend
+                zip -r lambda_function.zip .
+                aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --zip-file fileb://lambda_function.zip
+
+                
