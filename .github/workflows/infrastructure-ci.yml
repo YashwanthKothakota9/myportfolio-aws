@@ -54,15 +54,15 @@ jobs:
           name: terraform-plan
           path: plan.json
 
-  manual-approval:
-    needs: terraform-plan
-    runs-on: ubuntu-latest
-    steps: 
-      - name: Await Manual approval
-        uses: hmarr/auto-approve-action@v3
+  # manual-approval:
+  #   needs: terraform-plan
+  #   runs-on: ubuntu-latest
+  #   steps: 
+  #     - name: Await Manual approval
+  #       uses: hmarr/auto-approve-action@v3
 
   terraform-apply:
-    needs: manual-approval
+    # needs: manual-approval
     runs-on: ubuntu-latest
     steps:
       - name: Acquire Lock
