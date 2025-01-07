@@ -45,14 +45,14 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -out=tfplan.binary
 
-      - name: Save Terraform Plan Output
-        run: terraform show -json tfplan.binary > plan.json
+      # - name: Save Terraform Plan Output
+      #   run: terraform show -json tfplan.binary > plan.json
 
       - name: Upload Plan
         uses: actions/upload-artifact@v3
         with:
           name: terraform-plan
-          path: plan.json
+          path: tfplan.binary
 
   # manual-approval:
   #   needs: terraform-plan
@@ -91,14 +91,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: terraform-plan
-          path: plan.json
-      
-      - name: Convert JSON to Binary
-        run: |
-          cat plan.json | terraform show - | terraform plan -input=false -out=tfplan.binary
+          path: tfplan.binary
 
-      - name: Terraform Init
-        run: terraform init -reconfigure
+      # - name: Terraform Init
+      #   run: terraform init -reconfigure
 
       - name: Apply Terraform Plan
         run: terraform apply -auto-approve tfplan.binary
