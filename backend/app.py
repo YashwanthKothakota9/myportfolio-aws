@@ -18,6 +18,10 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
-        'headers': {'Content-Type': 'application/json'},
+        'headers': {
+            'content-Type': 'application/json',
+            'Access-Control-Allow-Origin': 'https://d129pu071hahh1.cloudfront.net',
+            'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+        },
         'body': json.dumps({'visitor_count': count})
     }

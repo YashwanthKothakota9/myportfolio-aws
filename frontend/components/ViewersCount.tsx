@@ -10,7 +10,14 @@ export default function ViewersCount() {
     async function fetchViewersCount() {
       try {
         const response = await fetch(
-          'https://nwl36ysqi7.execute-api.us-east-1.amazonaws.com'
+          'https://nwl36ysqi7.execute-api.us-east-1.amazonaws.com',
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            mode: 'cors',
+          }
         );
         const data = await response.json();
         setViewersCount(data.visitor_count);
