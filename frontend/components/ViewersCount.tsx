@@ -10,7 +10,7 @@ export default function ViewersCount() {
     async function fetchViewersCount() {
       try {
         const response = await fetch(
-          'https://nwl36ysqi7.execute-api.us-east-1.amazonaws.com',
+          'https://nwl36ysqi7.execute-api.us-east-1.amazonaws.com/visitor-count',
           {
             method: 'GET',
             headers: {
