@@ -23,5 +23,5 @@ def lambda_handler(event, context):
             'Access-Control-Allow-Origin': "https://d129pu071hahh1.cloudfront.net",
             'Access-Control-Allow-Methods': "GET, POST, OPTIONS",
         },
-        'body': json.dumps({'visitor_count': count})
+        'body': json.dumps({'visitor_count': str(count)})
     }
