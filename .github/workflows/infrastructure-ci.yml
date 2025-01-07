@@ -40,7 +40,7 @@ jobs:
           terraform_version: 1.10.3
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -reconfigure
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan.binary
@@ -62,7 +62,7 @@ jobs:
   #       uses: hmarr/auto-approve-action@v3
 
   terraform-apply:
-    # needs: manual-approval
+    needs: terraform-plan
     runs-on: ubuntu-latest
     steps:
       - name: Acquire Lock
@@ -91,10 +91,30 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: terraform-plan
-          path: .
+          path: plan.json
+      
+      - name: Convert JSON to Binary
+        run: |
+          cat plan.json | terraform show - | terraform plan -input=false -out=tfplan.binary
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -reconfigure
 
       - name: Apply Terraform Plan
         run: terraform apply -auto-approve tfplan.binary
+      
+      - name: Trigger Frontend CI/CD
+        run: |
+          curl -X POST \
+          -H "Accept: application/vnd.github.everest-preview+json" \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{github.repository}}/dispatches \
+          -d '{"event_type":"trigger-frontend"}'
+      
+      - name: Trigger Backend CI/CD
+        run: |
+          curl -X POST \
+          -H "Accept: application/vnd.github.everest-preview+json" \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{ github.repository }}/dispatches \
+          -d '{"event_type":"trigger-backend"}'
