@@ -1,6 +1,6 @@
 provider "aws" {
   region  = "us-east-1"
-  profile = "iamadmin-general"
+  # profile = "iamadmin-general"
 }
 
 terraform {
@@ -10,7 +10,7 @@ terraform {
     region         = "us-east-1"
     dynamodb_table = "terraform-locks"
     encrypt        = true
-    profile        = "iamadmin-general"
+    # profile        = "iamadmin-general"
   }
 }
 
