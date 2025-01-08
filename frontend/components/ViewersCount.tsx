@@ -4,7 +4,7 @@ import { Eye } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function ViewersCount() {
-  const [viewersCount, setViewersCount] = useState(0);
+  const [viewersCount, setViewersCount] = useState(null);
 
   useEffect(() => {
     async function fetchViewersCount() {
@@ -32,7 +32,7 @@ export default function ViewersCount() {
   return (
     <>
       <Eye size={18} />
-      {viewersCount !== null ? viewersCount : 'Loading...'}
+      <p>{viewersCount !== null ? `Viewers: ${viewersCount}` : 'Loading...'}</p>
     </>
   );
 }

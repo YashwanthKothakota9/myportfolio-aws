@@ -1,5 +1,8 @@
 import Link from 'next/link';
-import ViewersCount from './ViewersCount';
+
+import dynamic from 'next/dynamic';
+
+const ViewersCount = dynamic(() => import('./ViewersCount'), { ssr: false });
 
 const ContactMe = () => {
   return (
