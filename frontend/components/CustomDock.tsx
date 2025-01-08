@@ -124,6 +124,7 @@ export function CustomDock({
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      setMounted(false);
     };
   }, []);
 
