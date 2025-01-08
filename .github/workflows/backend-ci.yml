@@ -15,20 +15,42 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
+
+
             - name: Setup Python
               uses: actions/setup-python@v4
               with:
                 python-version: '3.9'
+
+
             - name: Install dependencies
               run: |
                 cd backend
                 pip install -r requirements.txt
-            # - name: Run tests
-            #   run: |
-            #     cd backend
-            #     pytest
+                pip install -r requirements-dev.txt
+
+
+            - name: Run tests
+              run: |
+                cd backend
+                python -m pytest -v
+
+
             - name: Install jq
               run: sudo apt-get install jq
+
+
+            - name: Create Deployment package
+              run: |
+                cd backend
+                mkdir deploy_package
+                cp app.py deploy_package/
+                cp requirements.txt deploy_package/
+                cd deploy_package
+                pip install -r requirements.txt -t .
+                zip -r ../lambda_function.zip .
+
+
             - name: Deploy to Lambda
               env:
                 AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -49,7 +71,6 @@ jobs:
                 LAMBDA_FUNCTION_NAME=$(echo $TERRAFORM_OUTPUT | jq -r '.lambda_function_name.value')
 
                 cd backend
-                zip -r lambda_function.zip .
                 aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --zip-file fileb://lambda_function.zip
 
                 
