@@ -11,7 +11,7 @@ on:
     types: [trigger-frontend]
 
 jobs:
-  build-and-deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-
+      
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -29,16 +29,45 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+  
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm install
+      
+      - name: Build Project
+        run: |
+          cd frontend
+          npm run build
+      
+      - name: Start Next.js
+        run: |
+          cd frontend
+          npm run start & npx wait-on http://localhost:3000
+      
+      - name: Run Cypress Tests
+        run: |
+          cd frontend
+          npm run cypress:headless
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
       - name: Install Dependencies
         run: |
           cd frontend
           npm install
 
-      # - name: Run Tests
-      #   run: |
-      #     cd frontend
-      #     npm test
 
       - name: Build Project
         run: |
