@@ -45,7 +45,7 @@ export default function ViewersCount() {
     return (
       <>
         <Eye size={18} />
-        <p>Failed to load viewers count</p>
+        <p suppressHydrationWarning>Failed to load viewers count</p>
       </>
     );
   }
@@ -53,7 +53,9 @@ export default function ViewersCount() {
   return (
     <>
       <Eye size={18} />
-      <p>{viewersCount !== null ? `Viewers: ${viewersCount}` : 'Loading...'}</p>
+      <p suppressHydrationWarning>
+        {viewersCount !== null ? `Viewers: ${viewersCount}` : 'Loading...'}
+      </p>
     </>
   );
 }
