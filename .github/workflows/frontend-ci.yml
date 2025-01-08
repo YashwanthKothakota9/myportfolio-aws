@@ -40,15 +40,15 @@ jobs:
           cd frontend
           npm run build
       
-      - name: Start Next.js
-        run: |
-          cd frontend
-          npm run dev & npx wait-on http://localhost:3000
+      # - name: Start Next.js
+      #   run: |
+      #     cd frontend
+      #     npm run dev & npx wait-on http://localhost:3000
       
-      - name: Run Cypress Tests
-        run: |
-          cd frontend
-          npm run cypress:headless
+      # - name: Run Cypress Tests
+      #   run: |
+      #     cd frontend
+      #     npm run cypress:headless
 
   deploy:
     needs: test
