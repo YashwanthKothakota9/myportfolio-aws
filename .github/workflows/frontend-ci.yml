@@ -43,7 +43,7 @@ jobs:
       - name: Start Next.js
         run: |
           cd frontend
-          npm run start & npx wait-on http://localhost:3000
+          npm run dev & npx wait-on http://localhost:3000
       
       - name: Run Cypress Tests
         run: |
