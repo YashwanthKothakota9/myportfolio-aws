@@ -30,3 +30,5 @@ Languages, Libraries and Frameworks used
  - Backend
     - Python
     - Pytest
+
+Detailed journey of this project is in my [blog](https://dev.to/yashwanthkothakota9/from-idea-to-development-my-journey-completing-the-cloud-resume-challenge-aws-37ip).
